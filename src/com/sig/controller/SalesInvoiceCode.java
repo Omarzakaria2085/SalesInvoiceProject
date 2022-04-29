@@ -1,10 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license Iheader, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.sig.controller;
-
 import com.sig.model.InvoiceHeader;
 import com.sig.model.InvoiceHeaderToTable;
 import com.sig.model.InvoiceLine;
@@ -45,7 +44,6 @@ public class SalesInvoiceCode implements ActionListener, ListSelectionListener  
     
     @Override
     public void actionPerformed(ActionEvent e) {
-
         switch (e.getActionCommand()) {
             case "CreateNewInvoice":
                 displayNewInvoiceDialog();
@@ -87,20 +85,19 @@ public class SalesInvoiceCode implements ActionListener, ListSelectionListener  
         if (result == JFileChooser.APPROVE_OPTION) {
             File headerFile = openFile.getSelectedFile();
             try {
-                FileReader headerFr = new FileReader(headerFile);
-                BufferedReader headerBr = new BufferedReader(headerFr);
-                String headerLine = null;
+                FileReader headerFR = new FileReader(headerFile);
+                BufferedReader headerBR = new BufferedReader(headerFR);
+                String Lineheader = null;
+                while ((Lineheader = headerBR.readLine()) != null) {
+                    String[] headerParts = Lineheader.split(",");
+                    String invoiceNoString = headerParts[0];
+                    String invoiceDateString = headerParts[1];
+                    String customerName = headerParts[2];
 
-                while ((headerLine = headerBr.readLine()) != null) {
-                    String[] headerParts = headerLine.split(",");
-                    String invNumStr = headerParts[0];
-                    String invDateStr = headerParts[1];
-                    String custName = headerParts[2];
+                    int invoiceNo = Integer.parseInt(invoiceNoString);
+                    Date invoiceDate = df.parse(invoiceDateString);
 
-                    int invNum = Integer.parseInt(invNumStr);
-                    Date invDate = df.parse(invDateStr);
-
-                    InvoiceHeader inv = new InvoiceHeader(invNum, custName, invDate);
+                    InvoiceHeader inv = new InvoiceHeader(invoiceNo, customerName, invoiceDate);
                     frame.getInvoicesList().add(inv);
                 }
 
@@ -108,21 +105,21 @@ public class SalesInvoiceCode implements ActionListener, ListSelectionListener  
                 result = openFile.showOpenDialog(frame);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File linesFile = openFile.getSelectedFile();
-                    BufferedReader linesBr = new BufferedReader(new FileReader(linesFile));
+                    BufferedReader linesBR = new BufferedReader(new FileReader(linesFile));
                     String linesLine = null;
-                    while ((linesLine = linesBr.readLine()) != null) {
+                    while ((linesLine = linesBR.readLine()) != null) {
                         String[] lineParts = linesLine.split(",");
-                        String invNumStr = lineParts[0];
+                        String invoiceNumString = lineParts[0];
                         String itemName = lineParts[1];
-                        String itemPriceStr = lineParts[2];
-                        String itemCountStr = lineParts[3];
+                        String itemPriceString = lineParts[2];
+                        String itemAmountString = lineParts[3];
 
-                        int invNum = Integer.parseInt(invNumStr);
-                        double itemPrice = Double.parseDouble(itemPriceStr);
-                        int itemCount = Integer.parseInt(itemCountStr);
-                        InvoiceHeader header = findInvoiceByNum(invNum);
-                        InvoiceLine invLine = new InvoiceLine(itemName, itemPrice, itemCount, header);
-                        header.getLines().add(invLine);
+                        int invoiceNum = Integer.parseInt(invoiceNumString);
+                        double itemPrice = Double.parseDouble(itemPriceString);
+                        int itemamount = Integer.parseInt(itemAmountString);
+                        InvoiceHeader Iheader = findInvoiceByNum(invoiceNum);
+                        InvoiceLine invoiceLine = new InvoiceLine(itemName, itemPrice, itemamount, Iheader);
+                        Iheader.getLines().add(invoiceLine);
                     }
                     frame.setInvoiceHeaderTableModel(new InvoiceHeaderToTable(frame.getInvoicesList()));
                     frame.getInvoicesTable().setModel(frame.getInvoiceHeaderTableModel());
